@@ -41,7 +41,7 @@ The FunMaps toolbox helps automate the creation of resting state functional parc
 ![alt text](https://www.biorxiv.org/content/biorxiv/early/2023/12/18/2023.12.15.571854/F3.large.jpg?width=800&height=600&carousel=1)
 FunMaps is designed to streamline the process of conducting resting state functional mapping analyses. The toolbox takes in preprocessed resting state time series data in NIFTI format, converts the brain data into 1-dimensional vectors using AFNI, and conducts a parcellation analysis using the INFOMAP algorithm. Below the parcellation procedure is described in more detail for the whole brain.
 
-First, we made two masks using the Freesurfer cortical and subcortical segmentations a cortical mask that included cerebellar voxels and a subcortical mask that included brain stem voxels. Voxels with poor tSNR (< 10) and prominent blood vessel signal (identified from a standard deviation map of the volume-registered EPI data 36) were removed from the masks. The cortical mask was then downsampled to 6 mm3-resolution to speed up analysis run times, while the subcortical mask was downsampled to 3 mm3-resolution, because of its smaller starting volume. From there the whole-brain time series data was transformed into a 1D vector, downsampled, and masked for both cortex and subcrotex using AFNI's 3dmaskdump command. 
+First, we made two masks using the Freesurfer cortical and subcortical segmentations a cortical mask that included cerebellar voxels and a subcortical mask that included brain stem voxels. Voxels with poor tSNR (< 10) and prominent blood vessel signal (identified from a standard deviation map of the volume-registered EPI data) were removed from the masks. The cortical mask was then downsampled to 6 mm3-resolution to speed up analysis run times, while the subcortical mask was downsampled to 3 mm3-resolution, because of its smaller starting volume. From there the whole-brain time series data was transformed into a 1D vector, downsampled, and masked for both cortex and subcrotex using AFNI's 3dmaskdump command. 
 
 Next, we randomly split the participants into halves for 10 iterations. For each iteration we calculated the average ROI-to-non-ROI functional connectivity matrices. For each of ten iterations, group-average correlation matrices between the mask and whole-brain voxels were calculated for each half of data (done separately for the cortical and subcortical masks). These matrices were made square by correlating each column of the whole-brain x mask (cortical or subcortical) matrix with themselves. The real-valued correlation matrices were then thresholded into binary. 
 
@@ -52,13 +52,18 @@ Finally, we used a best-match criterion to ensure that all voxels were labelled 
 
 This procedure can also be done for specfic ROI's instead of across the whole brain. For example we conducted a parcellation analysis of the ATL that used the same parcellation procedure as decribed above. This time a ATL mask was used in place of the whole-brain mask, and ATL cortical/subcortical masks were used in place of their whole-brain counterparts. 
 
+## What is inside this toolbox
+1. parcelWrapper: a wrapper function that contains all of the variables the average user will need to modify to run the toolbox
+2. dumpTS: converts .nii brain timeseries data to 
+
 ## Instructions for running toolbox
 1. Create a home directory following the prescribed structure
 2. Place your time series files in the brain subdirectory
     * time series files must be in NIFTI format
 3. Place your mask files in the mask subdirectory
     * mask files must be in NIFTI format
-    * ADD SOMETHING ABOUT MASKS AND MASK SELECTION
+    * (ADD SOMETHING ABOUT deveining MASKS AND MASK SELECTION)
+    * We recommend deveining your masks before using them in your analysis pipeline. Veins can be identified from a standard deviation map of the volume-registered EPI data.
 4. Edit parcelWrapper.m to match your specific requirements
     * Define your starting resolution for ROI's and target
     * Define your ending resolution for ROI's and target
@@ -70,3 +75,4 @@ This procedure can also be done for specfic ROI's instead of across the whole br
 6. Select thresholds for each ROI after viewing agreement curves and add themn to parcelWrapper.m 
 7. Run second part of parcelWrapper.m
 8. Undump resultant parcellation files using AFNI
+
