@@ -34,7 +34,7 @@ The FunMaps toolbox helps automate the creation of resting state functional parc
 3. Download Infomap binaries
 4. Install afni and add to path
 5. Check afni installation with afnicheck.py
-7. Add the path to your Infomap binaries to parcelWrapper.m under the variable
+7. Add the path to your Infomap binaries to parcelWrapper.m to the **infoMapDir** variable
 -include screenshot of where to edit wrapper
 
 ## What it can do
