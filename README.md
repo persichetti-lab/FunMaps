@@ -54,7 +54,10 @@ This procedure can also be done for specfic ROI's instead of across the whole br
 
 ## What is inside this toolbox
 1. parcelWrapper: a wrapper function that contains all of the variables the average user will need to modify to run the toolbox
-2. dumpTS: converts .nii brain timeseries data to 
+2. dumpTS: converts .nii brain timeseries data to 1-dimensional vectors using AFNI's 3dmaskdump command
+3. genSplit: creates group-averaged split half matrices, threshholds said matrices, and converts these into PAJEK format
+4. genClust: takes thresholded PAJEK matrices and searches for cluster prototypes using infoMAP 
+5. genParc: remaps the your chosen prototype onto your target
 
 ## Instructions for running toolbox
 1. Create a home directory following the prescribed structure
