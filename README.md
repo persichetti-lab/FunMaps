@@ -18,10 +18,11 @@ FunMaps is designed to streamline the process of conducting resting state functi
 ## software dependencies 
 - AFNI (added to the path)
   * https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/background_install/install_instructs/index.html
-- INFOMAP
+- Infomap
   * https://github.com/mapequation/infomap/releases/tag/v2.7.1
   * note this toolbox only supports Infomap v2.0 and beyond as the file structure changed
 - MATLAB
+- Human Connectome Workbench
 ## data and directory structure 
 - Mask files for the target and roi's you would like to analyze
 - Resting state timeseries in .nii format
