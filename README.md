@@ -21,6 +21,8 @@ FunMaps is designed to streamline the process of conducting resting state functi
 - Infomap
   * https://github.com/mapequation/infomap/releases/tag/v2.7.1
   * note this toolbox only supports Infomap v2.0 and beyond as the file structure changed
+  * more information about the Infomap dependency can be found here:
+  * https://www.mapequation.org/infomap/
 - MATLAB
   * https://www.mathworks.com/products/matlab.html
 - Connectome Workbench
