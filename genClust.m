@@ -25,6 +25,11 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
 
             cd(splitDir)
             coordFile = sprintf('%s/%s_%imm.1D',maskDir, roiName, roiDownDim);
+            
+            threshData = zeros(length(testThreshArray),numSplit);
+            numNets = zeros(length(testThreshArray),numSplit);
+            nullThresh = zeros(length(testThreshArray),numSplit);
+            nullNets = zeros(length(testThreshArray),numSplit);
             for i = 1:numSplit
                 for j=1:length(testThreshArray)
                     for h = 1:2
@@ -106,8 +111,8 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
                         end
                     end
                 
-                    threshData(i,numSplit) = length(find(agreeKey>0))/length(agreeKey);
-                    numNets(i,numSplit) = agreeCounter;
+                    threshData(j,i) = length(find(agreeKey>0))/length(agreeKey);
+                    numNets(j,i) = agreeCounter;
                 
                     for k=1:agreeCounter
                     tempind = find(agreeKey==k);
@@ -166,21 +171,24 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
             %option to view
             figure
             hold on
-            plot(testThreshArray,mean(threshData'));
-            plot(testThreshArray,mean(threshData')+std(threshData')/sqrt(numSplit));
-            plot(testThreshArray,mean(threshData')-std(threshData')/sqrt(numSplit));
-            plot(testThreshArray,mean(nullThresh'));
-            plot(testThreshArray,mean(nullThresh')+std(nullThresh')/sqrt(numSplit));
-            plot(testThreshArray,mean(nullThresh')-std(nullThresh')/sqrt(numSplit));
+            plot(testThreshArray,mean(threshData,2));
+            plot(testThreshArray,mean(threshData,2)+std(threshData,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(threshData,2)-std(threshData,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullThresh,2));
+            plot(testThreshArray,mean(nullThresh,2)+std(nullThresh,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullThresh,2)-std(nullThresh,2)/sqrt(numSplit));
             
             figure
             hold on
-            plot(testThreshArray,mean(numNets'));
-            plot(testThreshArray,mean(numNets')+std(numNets')/sqrt(numSplit));
-            plot(testThreshArray,mean(numNets')-std(numNets')/sqrt(numSplit));
-            plot(testThreshArray,mean(nullNets'));
-            plot(testThreshArray,mean(nullNets')+std(nullNets')/sqrt(numSplit));
-            plot(testThreshArray,mean(nullNets')-std(nullNets')/sqrt(numSplit));
+            plot(testThreshArray,mean(numNets,2));
+            plot(testThreshArray,mean(numNets,2)+std(numNets,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(numNets,2)-std(numNets,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullNets,2));
+            plot(testThreshArray,mean(nullNets,2)+std(nullNets,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullNets,2)-std(nullNets,2)/sqrt(numSplit));
+
+            save("agreeTable.mat","threshData","numNets");
+
 %     
 %             threshAgree = [testThreshArray mean(threshData') ];
 % 

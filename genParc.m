@@ -155,4 +155,4 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimAr
     outMap = sprintf('%s/%s_parcellation.1D',homeDir,targetName);
     save(outMap,'tempData','-ASCII');
     f = "done";
- end
+end
