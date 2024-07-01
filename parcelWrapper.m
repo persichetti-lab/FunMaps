@@ -27,25 +27,30 @@ testThreshArray = [0.5 0.6 0.7 0.8 0.85 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 
 %selected threshold for use for each of your rois
 roiThreshArray = zeros(length(roiNameArray),1);
 
-% %Dump your brain time series into 1D files for each of the roi's
-% for i = 1:length(roiNameArray)
-%     dumpTS(homeDir, brainHead, roiNameArray(i), originDim, roiDownDimArray(i))
-% end
-% %Dump your brain time series into 1D files for target region
-% dumpTS(homeDir, brainHead, targetName, originDim, targetDownDim)
-% %Generate split halves for each roi
-% for i = 1:length(roiNameArray)
-%     genSplit(homeDir, roiNameArray(i), roiDownDimArray(i), targetDownDim, targetName, numSplit, testThreshArray)
-% end
-% %Generate preliminary clusters for each roi
-% for i = 1:length(roiNameArray)
-%     genClust(infoMapDir, homeDir, roiNameArray(i), numSplit, roiDownDimArray(i), testThreshArray)
-% end
-% %Remap clusters for each ROI back onto the target and combine them
+%Dump your brain time series into 1D files for each of the roi's
+for i = 1:length(roiNameArray)
+    dumpTS(homeDir, brainHead, roiNameArray(i), originDim, roiDownDimArray(i))
+end
+
+%Dump your brain time series into 1D files for target region
+dumpTS(homeDir, brainHead, targetName, originDim, targetDownDim)
+
+%Generate split halves for each roi
+for i = 1:length(roiNameArray)
+    genSplit(homeDir, roiNameArray(i), roiDownDimArray(i), targetDownDim, targetName, numSplit, testThreshArray)
+end
+
+%Generate preliminary clusters for each roi
+for i = 1:length(roiNameArray)
+    genClust(infoMapDir, homeDir, roiNameArray(i), numSplit, roiDownDimArray(i), testThreshArray)
+end
+
+%Remap clusters for each ROI back onto the target and combine them
 for i = 1:length(roiNameArray)
     promptText = sprintf('input selected threshold for %s:',roiNameArray(i));
     roiThreshArray(i,1) = input(promptText);
 end
-% genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimArray, targetDownDim, originDim, roiThreshArray)
+genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimArray, targetDownDim, originDim, roiThreshArray)
+
 %generate volumes of prototypes and parcels for visualization
 genVolume( homeDir, roiNameArray, targetName, originDim, roiThreshArray, roiDownDimArray)
