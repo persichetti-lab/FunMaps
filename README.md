@@ -1,18 +1,15 @@
 # FunMaps V0.1 - BETA
 
-This is a matlab toolbox to perform functional mapping analyses on resting state fMRI data. Mostly a set of wrapper functions for AFNI and INFOMAP tailored for functional parcellations of resting state data.
-FunMaps is designed to streamline the process of conducting resting state functional mapping analyses. The toolbox takes in preprocessed resting state time series data in NIFTI format, converts the brain data into 1-dimensional vectors using AFNI, and conducts a parcellation analysis using the INFOMAP algorithm. Below the parcellation procedure is described in more detail for the whole brain.
+FunMaps is a matlab-based toolbox developed to perform flexible and data-driven functional parcellations of the brain to derive network maps with relatively small resting-state fMRI datasets collected in individual labs. FunMaps is a set of functions that are controlled through a wrapper script. Below, you will find a list of the software needed to run FunMaps and how to download them, and detailed instructions for using the toolbox. Please download this paper for more details about FunMaps and a demonstration of how to use it: xxx. A rs-fMRI dataset used in teh paper is available on the OSF website: XXX. Please download the data and have **fun** making brain **maps!**
 
 ## Contributors
+- Andrew Persichetti
 - Jiayu Shao 
-- Andrew Persichetti 
 - Stephen J. Gotts
 ## TOC
 - [FunMaps v0.1 - BETA](#funmaps-v01---beta)
-    - [dependencies](#dependencies)
-    - [data and directory structure](#data-and-directory-structure)
+    - [software dependencies](#dependencies)
     - [Installation](#installation)
-    - [What is inside this toolbox](#What-is-inside-this-toolbox)
     - [How to make funmaps](#how-to-make-funmaps)
 
 ## software dependencies 
@@ -27,57 +24,57 @@ FunMaps is designed to streamline the process of conducting resting state functi
   * https://www.mathworks.com/products/matlab.html
 - Connectome Workbench
   * https://www.humanconnectome.org/software/connectome-workbench
-## data and directory structure 
-- Mask files for the target and roi's you would like to analyze
-- Resting state timeseries in .nii format
-- DIR STRUCTURE SCHEMATIC
 ## Installation
-1. Clone this repo
-2. Check you have all the software dependencies listed in the README file
-3. Download Infomap binaries
-4. Install afni and add to path
-5. Check afni installation with afnicheck.py
-7. Add the path to your Infomap binaries to parcelWrapper.m to the **infoMapDir** variable
--include screenshot of where to edit wrapper
-## What is inside this toolbox
-1. parcelWrapper: a wrapper function that contains all of the variables the average user will need to modify to run the toolbox
-2. dumpTS: converts .nii brain timeseries data to 1-dimensional vectors using AFNI's 3dmaskdump command
-   * The dumpTS function extracts native resolution brain voxel-wise time series data into a 1-Dimensional (1D) vector for voxels in each ROI mask in native and down sampled resolution. 
-4. genSplit: creates group-averaged split half matrices, threshholds said matrices, and converts these into PAJEK format
-5. genClust: takes thresholded PAJEK matrices and searches for cluster prototypes using infoMAP 
-6. genParc: remaps the your chosen prototype onto your target
+1. Clone this repository
+2. Check you have all the software dependencies listed in the README file (above)
+    * Download Infomap binaries
+    * Install afni and add to path
+    * Check afni installation with afnicheck.py
+    * Add the path to your Infomap binaries to parcelWrapper.m to the **infoMapDir** variable
 ## how to make funmaps
-1. Create a home directory following the prescribed structure
-2. Place your time series files in the brain subdirectory
-    * time series files must be in NIFTI format
-3. Place your mask files in the mask subdirectory
-    * mask files must be in NIFTI format
-    * (ADD SOMETHING ABOUT deveining MASKS AND MASK SELECTION)
-    * We recommend deveining your masks before using them in your analysis pipeline. Veins can be identified from a standard deviation map of the volume-registered EPI data.
-4. Edit parcelWrapper.m to match your specific requirements
-    * Define your starting resolution for ROI's and target
-    * Define your ending resolution for ROI's and target
-    * Define your ROI's and target names
-    * ![alt text](https://www.biorxiv.org/content/biorxiv/early/2023/12/18/2023.12.15.571854/F2.large.jpg?width=800&height=600&carousel=1)
-    * Define your threshholds for each ROI
-    * Define number of split half iterations
-5. Run parcelWrapper.m
-6. Select thresholds for each ROI after viewing agreement curves and add themn to parcelWrapper.m 
-7. Run second part of parcelWrapper.m
-8. Undump resultant parcellation files using AFNI
+*** Below is a detailed description of each step in the toolbox. Users will modify variables in the wrapper (parcelWrapper.m) that will be passed to the serial set of functions described below.**
+1. **Data and materials needed to run FunMaps**
+* Before running FunMaps, you will need to make an experiment directory with two subdirectories: One called “brains” that contains the cleaned rs-fMRI timeseries data for all participants in the study and another directory called “masks” that contains two types of masks in the native resolution of the timeseries data. All data needs to be in NiFTI format and a standard volumetric space (the example funmaps data are in Talairach space).
+* The first type of mask is the region of interest (ROI) mask, which consists of all the voxels within the brain region(s) that you want to parcellate.
+  * The ROI mask can range in size from a small region of study (e.g., the anterior portion of the temporal lobes – Persichetti et al., 2021) to the whole brain (Persichetti et al., 2023). If your ROI includes both cortical and subcortical voxels, then we recommend separating the ROI mask into cortical and subcortical masks. The pipeline can handle multiple ROI masks at a time, if necessary. The cortical and subcortical ROI’s will be parcellated separately and then combined at a later step in the pipeline.
+* The second type of mask is the target mask, which will often be a whole-brain mask, but you can also decide to exclude voxels that are in your ROI mask – e.g., if you have a small ROI mask and you do not want to use voxel-to-voxel correlations from within the ROI (see Persichetti et al., 2021 for an example of this approach).
+* Additionally, we recommend removing voxels with poor temporal signal-to-noise ratio (tSNR) and prominent blood vessel signal from both types of masks. The toolbox includes an auxiliary function (cleanMask.m) that removes from each mask voxels with poor tSNR and prominent blood vessel signals (identified from a standard deviation map of the volume registered EPI data – (Kalcher et al., 2015).
 
-## INTEGRATE WITH THE ABOVE SECTION 
-![alt text](https://www.biorxiv.org/content/biorxiv/early/2023/12/18/2023.12.15.571854/F3.large.jpg?width=800&height=600&carousel=1)
+2. **dumpTS.m - extracts voxelwise timeseries data from each mask**
+* The dumpTS function downsamples the data and masks to a lower spatial resolution, then extracts voxelwise time series data from the rs-fMRI volumes and saves it into text files. Downsampling the data before starting the parcellation saves lots of time without sacrificing performance of the parcellation routine.
+  * For example, in Persichetti et al. (2023), we started with 2 mm<sup>3</sup> resolution voxels, then downsampled the whole-brain target mask and the cortical ROI mask to 6 mm3 resolution, while the subcortical ROI mask was downsampled to 3 mm<sup>3</sup> resolution because of its smaller starting volume. Users can choose to omit or modify the degree of down sampling to match the needs of their data, using the variables **roiDownDimArray** and **targetDownDim** in the wrapper.
+  * Next, to lower data storage requirements, the ROI and target masks are used to extract voxelwise time series data from the rs-fMRI volumes and save it into 1D vectors. Thus, the output of this step will be new downsampled masks in the masks directory (if downsampling is indicated in the wrapper, highly recommended) and a new subdirectory, named timeseries, that contains 1D text files of voxelwise rs-fMRI timeseries data from each participant and each mask in the desired spatial resolution.
+  *       
+3. **genSplits.m - Creates random split-half datasets**
+* The genSplits function randomly splits the participant data into two equal groups, calculates the voxelwise correlation matrices between each ROI mask and the target mask data (done separately for each ROI mask) for each participant, then combines the correlation matrices from all participants in each split-half group to create a group-averaged correlation matrix in each half of the data.
+  * This process is repeated over several iterations (we recommend ten split-half iterations as a good tradeoff between finding stability and minimizing computation time), each time randomly splitting the group of participants into two equal sized groups. 
+* The group-averaged ROI x target matrix from each half and each iteration is then made square by calculating the column-wise correlation, yielding an ROI-voxels x ROI-voxels matrix that reflects the similarity of connectivity patterns from ROI voxels to the voxels in the target mask.
+* The final step formats the matrices to be compatible with the InfoMap algorithm that will be used in the next step of the pipeline. Specifically, the real-valued correlation matrices are thresholded into binary (0 or 1) undirected matrices at a range of threshold values representing the top percentages of connections and then converted to the Pajek file format. 
+* *** In the examples used in this paper, we used the following thresholds: 50, 60, 70, 80, 85, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, and 99.5% (indicated in the wrapper by the variable testThreshArray as proportions – e.g., 0.5, 0.6, 0.7, etc.). We used this wide range of thresholds to give the reader a sense of the effect thresholding has on the parcellation routine. However, we recommend that users constrain this range to something closer to steps of 3% between 80-95% to save time, since we have consistently found that ideal thresholds to be 85% for subcortical masks and 90% for cortical masks.
 
-First, we made two masks using the Freesurfer cortical and subcortical segmentations a cortical mask that included cerebellar voxels and a subcortical mask that included brain stem voxels. Voxels with poor tSNR (< 10) and prominent blood vessel signal (identified from a standard deviation map of the volume-registered EPI data) were removed from the masks. The cortical mask was then downsampled to 6 mm3-resolution to speed up analysis run times, while the subcortical mask was downsampled to 3 mm3-resolution, because of its smaller starting volume. From there the whole-brain time series data was transformed into a 1D vector, downsampled, and masked for both cortex and subcrotex using AFNI's 3dmaskdump command. 
+4. **genClusters.m - Creates network prototypes**
+* The genClusters function searches for network prototypes in the thresholded matrices of each split-half group using the InfoMap algorithm to form optimal two-level partitions (FunMaps searches for the optimal solution over 100 searches on each split-half iteration). 
+* Prototypes found in each half of the data are required to replicate across halves in each iteration. Specifically, in each iteration, a prototype is counted as replicating if the Dice coefficient [(2|X ⋂ Y|∕(|X|+|Y|)] is greater than 0.5 and the volume of the intersecting voxels for the prototype is at least 2% of the ROI mask size. Network prototypes that meet these criteria are retained in each iteration. 
+* After repeating the above steps for all iterations, an agreement matrix is created, such that each cell reflects the proportion of iterations in which two voxels were part of the same network prototype that agreed across the split halves. Thus, if two voxels were part of a prototype that was present in eight out of ten iterations, then that cell of the matrix would get a value of 0.8 to indicate that it was present in 80% of the iterations. The matrix is then thresholded such that two voxels are required to be part of the same prototype in at least 50% of the iterations. 
+  * *** It is important to note that at this step the matrix has lost the prototype labels and is simply a binarized matrix reflecting generic network prototype membership across voxels. The voxels will be relabeled in the next step of the toolbox (genParcels).
 
-Next, we randomly split the participants into halves for 10 iterations. For each iteration we calculated the average ROI-to-non-ROI functional connectivity matrices. For each of ten iterations, group-average correlation matrices between the mask and whole-brain voxels were calculated for each half of data (done separately for the cortical and subcortical masks). These matrices were made square by correlating each column of the whole-brain x mask (cortical or subcortical) matrix with themselves. The real-valued correlation matrices were then thresholded into binary. 
+* The above process is completed for all thresholds indicated in the prior step and agreement curves for each ROI mask are constructed across thresholds.
+* The agreement curves can be evaluated to find the threshold with the desired split-half agreement in brain coverage (i.e., the percentage of voxels assigned to a prototype at each threshold) and the total number of prototypes retained. 
+* **At this point, the program pauses and asks the user to enter on the command line which threshold should be used for each ROI mask.** Once the user enters the desired threshold for each ROI mask on the command line, the program resumes the parcellation for those thresholds only. In the example presented in the paper, we chose 90% for the cortical mask and 85% as the threshold for the subcortical mask because we have consistently found these to be ideal thresholds for these types of masks.
+  * However, **it is critical that users evaluate the agreement curves and decide for themselves how they want to proceed**, since the optimal threshold will be dependent on features of each dataset, such as sample size and tSNR. 
+* In addition to evaluating the agreement curves, users should run the auxiliary function called **undumpPrototypes.m** that is provided in the FunMaps toolbox to map the prototypes (in the downsampled space) at a given threshold onto the brain volume. The volumetric prototypes are saved in a text file named with the ROI mask and the threshold value (e.g., cortex_prototypeNets_90.1D) and as a NIfTI formatted brain volume with the same name. The resultant brain map will give the user a good idea about whether the parcellation solution at the selected threshold is reasonable or not.
 
-Then, we searched for functional network prototypes (i.e., sets of voxels in the group-averaged data with similar patterns of whole brain connectivity) across each mask using the InfoMap clustering algorithm. The thresholded matrices of each half were  clustered using InfoMap to form optimal two-level partitions (i.e., the optimal solution found over one hundred searches). This gives a set of network prototypes that are evaluated for replication. A network prototype was counted as replicating across halves on each iteration if the Dice coefficient [Dice(x,y) = (2*(x∩y))/(x+y)] was ≥0.5, and the volume of the intersection was at least 2% of the size of the cortical or subcortical mask, respectively. The intersection of each network prototype that replicated across the two halves of data was retained for that iteration. After repeating the above steps for each of the ten iterations, one average parcellation of the retained network prototypes was formed, keeping voxels from any prototype that co-occurred in 50% or more of the iterations. Agreement curves were constructed across thresholds, and the threshold with the optimal proportion of coverage and number of detected prototypes was identified in each mask. We found that the split-half agreement and the number of detected prototypes were jointly optimized at the 90% threshold in the cortical mask and at the 85% threshold for the subcortical mask. The subcortex has a lower threshhold due to the comparatively weaker signal to noise ratio in that region. After choosing threshholds for each mask, we consolidated the replicating networks into a unified set of network prototoypes. At this stage of the parcellation, every voxel is not guaranteed to have a network label due to the stringent requirements for replication across iterations described above. 
+5. **genParcels.m - Assigns network labels in the original volume space**
+* The genParcels function assigns final network labels to each voxel in the original spatial resolution. To save time, this step is completed entirely on vectors in the 1D text file format. The network labels will be mapped onto a brain volume in the next step. 
+* First, the program iterates through the timeseries data for each ROI mask in each participant and makes a correlation matrix that reflects the pattern of functional connectivity between each voxel in the ROI mask with all voxels in the target mask. These correlation matrices are then averaged across participants in the downsampled space. 
+* These voxelwise patterns of connectivity are then assigned prototype labels, and voxels from the same prototype are averaged together to get an average pattern of brain connectivity for each prototype. The average pattern of brain connectivity for each prototype from all ROI masks is then correlated with the pattern from every voxel across the brain in the original spatial resolution of the data. Thus, a prototype that originated in the subcortical ROI mask can include network voxels in the cortex, and vice versa. 
+* In a winner-takes-all approach, each voxel is given the label of the network prototype that explains the most variance in that voxel. However, as a final quality assurance step, the winning network prototype must explain at least 50% of the variance (i.e., R2 > 0.5) in the functional connectivity pattern of a given voxel for it to get a final network label, otherwise the voxel does not get a label at this step. We do this to avoid giving “noise voxels” (e.g., voxels with prominent blood vessel signal) a network label. 
+* At the end of this step, the final network labels are saved in a 1D text file along with the coordinates of all brain voxels in the original spatial resolution of the data. 
+  * In the next and final step of the program, each voxel will be given a network label while remapping the data into the brain volume.
 
-Finally, we used a best-match criterion to ensure that all voxels were labelled in the end. We used InfoMap was again to search for networks in the unified set of network prototypes. We combined the subcortex and cortex masks and prototypes so that all network prototypes were in the same space. This ensured that when we next ran the best-match procedure, every voxel in the whole brain was assigned a network label. Any voxel could have a label that originated in either the cortical or subcortical mask. We calculated the pattern of connectivity between each network prototype and the whole brain. The pattern of whole-brain functional connectivity for each network prototype was then compared with the pattern of connectivity from each voxel in the whole brain, and we assigned the label of the network prototype with the most similar pattern (Pearson correlation) to that voxel, provided the best match was within a threshold level of similarity (R2 > 0.5). Since the cortical and subcortical voxels were combined before assigning a final network label to each voxel, cortical voxels could, in principle, be labeled as belonging to a subcortical network, and vice versa, according to the best-match criterion.
-
-This procedure can also be done for specfic ROI's instead of across the whole brain. For example we conducted a parcellation analysis of the ATL that used the same parcellation procedure as decribed above. This time a ATL mask was used in place of the whole-brain mask, and ATL cortical/subcortical masks were used in place of their whole-brain counterparts. 
-
-
+6. **genVolume.m - Create a final volume that includes all networks**
+* The genVolume function maps the network labels assigned to each voxel in the original spatial resolution of the data onto the brain volume in the NIfTI (.nii) file format. 
+* At this step, every voxel that was not assigned a network label in the previous step is given a label using nearest-neighbor interpolation. 
+* **The map of brain-wide functional networks provided by FunMaps is now complete** and the final volumetric rendering of the whole-brain network parcellation can be easily visualized.
+* The toolbox also includes an auxiliary function called **vol2surf.m** that uses the HCP Connectome Workbench (Marcus et al., 2013) to create a surface rendering of the cortical networks.
 
