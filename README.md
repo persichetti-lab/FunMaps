@@ -1,4 +1,5 @@
-# FunMaps V0.1 - BETA
+# FunMaps V0.1 - BETA    <img src="https://github.com/persichetti-lab/images/blob/main/funmaps_logo_dots3.png" width="300" height="270" align="right">
+
 
 FunMaps is a matlab-based toolbox developed to perform flexible and data-driven functional parcellations of the brain to derive network maps with relatively small resting-state fMRI datasets collected in individual labs. FunMaps is a set of functions that are controlled through a wrapper script. Below, you will find a list of the software needed to run FunMaps and how to download them, and detailed instructions for using the toolbox. Please download this paper for more details about FunMaps and a demonstration of how to use it: xxx. A rs-fMRI dataset used in teh paper is available on the OSF website: XXX. Please download the data and have **fun** making brain **maps!**
 
