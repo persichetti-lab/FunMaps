@@ -2,12 +2,12 @@
 % 1) directory that contains your cleaned time series files (i.e., homeDir)
 % 2) header format of your time series files (optional)
 % 3) roiMask in your scanner resolution
-% 4) downsampled mask in your target resolution (optional)
+% 4) downsampled mask in your context resolution (optional)
 % 5) how much you want to resample by (optional)
 
 %start with brain data and 
 %%%%make the downsampled mask, include how much to downsample it by
-%have downsample mask result be in target ratio instead
+%have downsample mask result be in context ratio instead
 %have a comment about needing to be isotropic -or that you would have to
 %run your own thing to be nonisotropic
 %add an if statement for downsampling
