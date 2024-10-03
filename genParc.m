@@ -1,11 +1,11 @@
 
-function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimArray, targetDownDim, targetOriginDim, roiThreshArray)
+function f = genParc( homeDir,infoMapDir, roiNameArray, contextName, roiDownDimArray, contextDownDim, contextOriginDim, roiThreshArray)
 % function f = genParc( inParc_1, outParc_1,combine, outName_2, inName_2,...
 % wrkDir_1, outDir,wrkDir_2, tsDir,ts_1,ts_2,ts_whole_down,ts_whole, mask1,...
-% mask2, target_Down_Mask, target_Mask, outMap)
+% mask2, context_Down_Mask, context_Mask, outMap)
     cd(homeDir)
     %roiTab = cell(length(roiNameArray));
-    targetTsDir = sprintf('%s/timeseries/%s', homeDir, targetName);
+    contextTsDir = sprintf('%s/timeseries/%s', homeDir, contextName);
     maskDir = sprintf('%s/masks', homeDir);
 
     for i = 1:length(roiNameArray)
@@ -59,19 +59,19 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimAr
         %roiTab{i,1} = load(sprintf('%s_consolidatedNets_%.3f.1D', roiName, roiThresh));
     end
     
-    %load in target masks
+    %load in context masks
     cd(maskDir)
-    tempCmd = sprintf('3dmaskdump -mask %s_%imm.nii -o %s_%imm.1D %s_%imm.nii', targetName, targetOriginDim,  targetName, targetOriginDim,  targetName, targetOriginDim);
+    tempCmd = sprintf('3dmaskdump -mask %s_%imm.nii -o %s_%imm.1D %s_%imm.nii', contextName, contextOriginDim,  contextName, contextOriginDim,  contextName, contextOriginDim);
     [~, ~] = system(tempCmd);
-    target_Mask = sprintf('%s_%imm.1D', targetName, targetOriginDim); 
-    target_Down_Mask = sprintf('%s_%imm.1D', targetName, targetDownDim);
-    target_Down_Coords = load(target_Down_Mask); 
-    target_Down_Coords = target_Down_Coords(:,1:3);
-    target_Origin_Coords = load(target_Mask);
-    target_Origin_Coords = target_Origin_Coords(:,1:3);
-    target_Mat = zeros(length(target_Down_Coords),length(target_Origin_Coords));
-    cd(targetTsDir)
-    roi_Down_Fnames = dir(sprintf('*%imm*.1D',targetDownDim));
+    context_Mask = sprintf('%s_%imm.1D', contextName, contextOriginDim); 
+    context_Down_Mask = sprintf('%s_%imm.1D', contextName, contextDownDim);
+    context_Down_Coords = load(context_Down_Mask); 
+    context_Down_Coords = context_Down_Coords(:,1:3);
+    context_Origin_Coords = load(context_Mask);
+    context_Origin_Coords = context_Origin_Coords(:,1:3);
+    context_Mat = zeros(length(context_Down_Coords),length(context_Origin_Coords));
+    cd(contextTsDir)
+    roi_Down_Fnames = dir(sprintf('*%imm*.1D',contextDownDim));
     
     roi_Mat = cell(length(roiNameArray),1);
 %roi_Fnames = cell(1:length(roiArray));
@@ -82,40 +82,40 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimAr
         roi_Down_Mask = sprintf('%s_%imm.1D', roiName, roiDownDimArray(i));
         roi_Down_Coords = load(roi_Down_Mask);
         roi_Down_Coords = roi_Down_Coords(:,1:3);
-        roi_Mat{i,1} = zeros(length(target_Down_Coords), length(roi_Down_Coords));
+        roi_Mat{i,1} = zeros(length(context_Down_Coords), length(roi_Down_Coords));
     
         roiTsDir = sprintf('%s/timeseries/%s', homeDir, roiName);
         cd(roiTsDir);
         for j = 1:length(roi_Down_Fnames)
-            target_Down_Ts = load(sprintf('%s/%s_%imm_%i.1D', targetTsDir, targetName, targetDownDim, j));
+            context_Down_Ts = load(sprintf('%s/%s_%imm_%i.1D', contextTsDir, contextName, contextDownDim, j));
             roi_TS = load(sprintf('%s/%s_%imm_%i.1D', roiTsDir, roiName, roiDownDimArray(i), j));
-            target_Down_Ts = target_Down_Ts';
+            context_Down_Ts = context_Down_Ts';
             roi_TS = roi_TS';
             
-            roi_2_TargetDown_Corr = corr(roi_TS,target_Down_Ts)';
-            tempind = isnan(roi_2_TargetDown_Corr);
-            roi_2_TargetDown_Corr(tempind) = 0;
+            roi_2_contextDown_Corr = corr(roi_TS,context_Down_Ts)';
+            tempind = isnan(roi_2_contextDown_Corr);
+            roi_2_contextDown_Corr(tempind) = 0;
         
-            roi_Mat{i,1} = roi_Mat{i,1} + roi_2_TargetDown_Corr;
+            roi_Mat{i,1} = roi_Mat{i,1} + roi_2_contextDown_Corr;
         end
         roi_Mat{i,1} = roi_Mat{i,1}/length(roi_Down_Fnames);
     end
 
     for i = 1:length(roi_Down_Fnames)
-        target_Origin_Ts = load(sprintf('%s/%s_%i.1D', targetTsDir, targetName,i));
-        target_Down_Ts = load(sprintf('%s/%s_%imm_%i.1D', targetTsDir, targetName, targetDownDim, i));
+        context_Origin_Ts = load(sprintf('%s/%s_%i.1D', contextTsDir, contextName,i));
+        context_Down_Ts = load(sprintf('%s/%s_%imm_%i.1D', contextTsDir, contextName, contextDownDim, i));
     
-        target_Origin_Ts = target_Origin_Ts';
-        target_Down_Ts = target_Down_Ts';
+        context_Origin_Ts = context_Origin_Ts';
+        context_Down_Ts = context_Down_Ts';
     
-        target_2_TargetDown_Corr = corr(target_Origin_Ts,target_Down_Ts)';
-        tempind = isnan(target_2_TargetDown_Corr);
-        target_2_TargetDown_Corr(tempind) = 0;    
+        context_2_contextDown_Corr = corr(context_Origin_Ts,context_Down_Ts)';
+        tempind = isnan(context_2_contextDown_Corr);
+        context_2_contextDown_Corr(tempind) = 0;    
         
-        target_Mat = target_Mat + target_2_TargetDown_Corr;
+        context_Mat = context_Mat + context_2_contextDown_Corr;
     end
 
-    target_Mat = target_Mat/length(roi_Down_Fnames);
+    context_Mat = context_Mat/length(roi_Down_Fnames);
 
     threshArray = cell(length(roiNameArray));
     roiCombDim = 0;
@@ -127,7 +127,7 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimAr
         roiCombDim = roiCombDim + max(threshArray{i,1});
     end
 
-    prototypes = zeros(length(target_Down_Coords),roiCombDim);
+    prototypes = zeros(length(context_Down_Coords),roiCombDim);
     prototypeCount = 0; 
     for i = 1:length(roiNameArray)
         tempThresh = threshArray{i,1};
@@ -141,9 +141,9 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimAr
         prototypeCount = prototypeCount + currProtoCount;
     end
 
-    newClass = zeros(length(target_Origin_Coords),1);
-    for ii=1:length(target_Origin_Coords)
-        temp = corr(prototypes,target_Mat(:,ii));
+    newClass = zeros(length(context_Origin_Coords),1);
+    for ii=1:length(context_Origin_Coords)
+        temp = corr(prototypes,context_Mat(:,ii));
         [y,i]=sort(temp);
         
         if (y(size(prototypes,2))>sqrt(0.5))
@@ -151,8 +151,8 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimAr
         end
     end
 
-    tempData = [target_Origin_Coords newClass];
-    outMap = sprintf('%s/%s_parcellation.1D',homeDir,targetName);
+    tempData = [context_Origin_Coords newClass];
+    outMap = sprintf('%s/%s_parcellation.1D',homeDir,contextName);
     save(outMap,'tempData','-ASCII');
     f = "done";
 end
