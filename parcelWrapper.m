@@ -5,10 +5,10 @@ addpath(currentFolder);
 homeDir = '/misc/data17/persichettias/jiayu/methodsPaper/TDRun2';
 %shared formatting text for your brain files
 brainHead = 'clean_restTS';
-%Name, native, and downsampled resolution(mm) of your target region
-targetName = 'WB';
+%Name, native, and downsampled resolution(mm) of your context region
+contextName = 'WB';
 originDim = 2;
-targetDownDim = 6;
+contextDownDim = 6;
 %Name and downsampled resolution(mm) of your ROI 
 roiNameArray = ["cortex", "subcortex"];
 roiDownDimArray = [6 3];
@@ -32,12 +32,12 @@ for i = 1:length(roiNameArray)
     dumpTS(homeDir, brainHead, roiNameArray(i), originDim, roiDownDimArray(i))
 end
 
-%Dump your brain time series into 1D files for target region
-dumpTS(homeDir, brainHead, targetName, originDim, targetDownDim)
+%Dump your brain time series into 1D files for context region
+dumpTS(homeDir, brainHead, contextName, originDim, contextDownDim)
 
 %Generate split halves for each roi
 for i = 1:length(roiNameArray)
-    genSplit(homeDir, roiNameArray(i), roiDownDimArray(i), targetDownDim, targetName, numSplit, testThreshArray)
+    genSplit(homeDir, roiNameArray(i), roiDownDimArray(i), contextDownDim, contextName, numSplit, testThreshArray)
 end
 
 %Generate preliminary clusters for each roi
@@ -45,12 +45,12 @@ for i = 1:length(roiNameArray)
     genClust(infoMapDir, homeDir, roiNameArray(i), numSplit, roiDownDimArray(i), testThreshArray)
 end
 
-%Remap clusters for each ROI back onto the target and combine them
+%Remap clusters for each ROI back onto the context and combine them
 for i = 1:length(roiNameArray)
     promptText = sprintf('input selected threshold for %s:',roiNameArray(i));
     roiThreshArray(i,1) = input(promptText);
 end
-genParc( homeDir,infoMapDir, roiNameArray, targetName, roiDownDimArray, targetDownDim, originDim, roiThreshArray)
+genParc( homeDir,infoMapDir, roiNameArray, contextName, roiDownDimArray, contextDownDim, originDim, roiThreshArray)
 
 %generate volumes of prototypes and parcels for visualization
-genVolume( homeDir, roiNameArray, targetName, originDim, roiThreshArray, roiDownDimArray)
+genVolume( homeDir, roiNameArray, contextName, originDim, roiThreshArray, roiDownDimArray)
