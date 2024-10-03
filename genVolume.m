@@ -1,4 +1,4 @@
-function f = genVolume( homeDir, roiNameArray, targetName, originDim, roiThreshArray, roiDownDimArray)
+function f = genVolume( homeDir, roiNameArray, contextName, originDim, roiThreshArray, roiDownDimArray)
     %generate volume for prototype 
     for i = 1:length(roiNameArray)
         roiClustDir = sprintf('%s/clusters/%s',homeDir,roiNameArray(i));
@@ -9,9 +9,9 @@ function f = genVolume( homeDir, roiNameArray, targetName, originDim, roiThreshA
         system(tempCmd);
     end
     %generate volume for parcellation
-    inFile = sprintf('%s/%s_parcellation.1D', homeDir,targetName);
-    maskFile = sprintf('%s/masks/%s_%imm.nii', homeDir,targetName, originDim);
-    outFile = sprintf('%s/%s_parcellation.nii', homeDir,targetName);
+    inFile = sprintf('%s/%s_parcellation.1D', homeDir,contextName);
+    maskFile = sprintf('%s/masks/%s_%imm.nii', homeDir,contextName, originDim);
+    outFile = sprintf('%s/%s_parcellation.nii', homeDir,contextName);
     tempCmd = sprintf('3dUndump -master %s -prefix %s %s', maskFile, outFile, inFile);
     system(tempCmd);
     %fills in all voxels using nearest neighbor algorithmn 
