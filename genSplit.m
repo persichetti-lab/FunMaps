@@ -2,14 +2,14 @@
 % 1) directory that contains your cleaned time series files
 % 2) header format of your time series files (optional)
 % 3) roiMask in your scanner resolution
-% 4) downsampled mask in your target resolution (optional)
+% 4) downsampled mask in your context resolution (optional)
 % 5) how much you want to resample by (optional)
 %add brain connectivity toolbox to path before running said script
-function y = genSplit(homeDir, roiName, roiDownDim, targetDownDim, targetName, numSplit, testThreshArray)
+function y = genSplit(homeDir, roiName, roiDownDim, contextDownDim, contextName, numSplit, testThreshArray)
     tsDir = sprintf('%s/timeseries',homeDir);
     maskDir = sprintf('%s/masks',homeDir);
     roiTsDir = sprintf('%s/%s',tsDir,roiName);
-    targetTsDir = sprintf('%s/%s', tsDir, targetName);
+    contextTsDir = sprintf('%s/%s', tsDir, contextName);
     splitsDir = sprintf('%s/splitHalves',homeDir);
     roiSplitsDir = sprintf('%s/splitHalves/%s', homeDir, roiName);
     
@@ -23,8 +23,8 @@ function y = genSplit(homeDir, roiName, roiDownDim, targetDownDim, targetName, n
     if ~exist(roiTsDir, 'dir')
        error("roi directory doesn't exist, please check your inputs")
     end
-    if ~exist(targetTsDir, 'dir')
-       error("target directory doesn't exist, please check your inputs")
+    if ~exist(contextTsDir, 'dir')
+       error("context directory doesn't exist, please check your inputs")
     end
     if ~exist(splitsDir, 'dir')
        mkdir(splitsDir)
@@ -39,26 +39,26 @@ function y = genSplit(homeDir, roiName, roiDownDim, targetDownDim, targetName, n
     cd(roiTsDir)
     fnames = dir(sprintf('*%s_%imm*.1D',roiName,roiDownDim));
 %     roiMask = sprintf('%s/%s_%0.1fmm.nii',maskDir,roiName,roiDownDim);
-%     targetMask = sprintf('%s/%s_%0.1fmm.nii', maskDir,targetName, targetDownDim);
+%     contextMask = sprintf('%s/%s_%0.1fmm.nii', maskDir,contextName, contextDownDim);
     roiMask1D = sprintf('%s/%s_%imm.1D',maskDir,roiName,roiDownDim);
-    targetMask1D = sprintf('%s/%s_%imm.1D', maskDir,targetName, targetDownDim);
-%     tempCmd = sprintf('3dmaskdump -mask %s -o %s %s', targetMask, targetMask1D, targetMask);
+    contextMask1D = sprintf('%s/%s_%imm.1D', maskDir,contextName, contextDownDim);
+%     tempCmd = sprintf('3dmaskdump -mask %s -o %s %s', contextMask, contextMask1D, contextMask);
 % % 	[returncode, ~] = system(tempCmd);
 %     [~, ~] = system(tempCmd);
 %     tempCmd = sprintf('3dmaskdump -mask %s -o %s %s', roiMask, roiMask1D, roiMask);
 % % 	[returncode, ~] = system(tempCmd);
 %     [~, ~] = system(tempCmd);   
     roiCoords = load(roiMask1D);
-    targetCoords = load(targetMask1D);
-    half1 = zeros(length(targetCoords), length(roiCoords));
-    half2 = zeros(length(targetCoords), length(roiCoords));
+    contextCoords = load(contextMask1D);
+    half1 = zeros(length(contextCoords), length(roiCoords));
+    half2 = zeros(length(contextCoords), length(roiCoords));
     %check split halving for odd number subjects, include in documentation
     %a line about it
     %have verbose error reporting
     for i = 1:numSplit
         tempind = randperm(length(fnames));
         for j = 1:(length(fnames)/2)
-            temp1 = load(sprintf('%s/%s_%imm_%i.1D',targetTsDir,targetName,targetDownDim, tempind(j)));
+            temp1 = load(sprintf('%s/%s_%imm_%i.1D',contextTsDir,contextName,contextDownDim, tempind(j)));
             temp2 = load(sprintf('%s/%s_%imm_%i.1D',roiTsDir,roiName,roiDownDim, tempind(j)));
            
             temp1 = temp1';
@@ -75,7 +75,7 @@ function y = genSplit(homeDir, roiName, roiDownDim, targetDownDim, targetName, n
         save(sprintf('%s/%s_iter%i_half1',roiSplitsDir,roiName, i),'half1','-v7.3')
 
         for k = round((length(fnames)/2) + 1:length(fnames))
-            temp1 = load(sprintf('%s/%s_%imm_%i.1D',targetTsDir,targetName,targetDownDim,tempind(k)));
+            temp1 = load(sprintf('%s/%s_%imm_%i.1D',contextTsDir,contextName,contextDownDim,tempind(k)));
             temp2 = load(sprintf('%s/%s_%imm_%i.1D',roiTsDir,roiName,roiDownDim,tempind(k)));
             
             temp1 = temp1';
