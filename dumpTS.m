@@ -16,7 +16,7 @@
 %check if directory already exists so as not to rerun it
 %add option to prefix
 %call nifti files brains or something like that
-%feed in wb ts files into target mask and undump it
+%feed in wb ts files into context mask and undump it
 %dump ts in roi of choice and then don't save the og resolution 
 function y = dumpTS(homeDir, brainHead, roiName, originRes, downRes)
     if exist(homeDir,"dir")
