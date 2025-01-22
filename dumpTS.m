@@ -2,7 +2,7 @@
 % for all ROIs and context at the desired spatial resolutions
 
 function y = dumpTS(homeDir, brainHead, roiName, originRes, downRes)
-% homeDir = directory that contains your cleaned time series files (i.e., homeDir)
+% 1) homeDir = directory that contains your cleaned time series files (i.e., homeDir)
 % 2) brainHead = common name of your time series files (e.g., if naming
 % convention is 's1.clean_ts.nii, s2.clean_ts.nii, etc.', then brainHead = clean_ts)
 % 3) roiName = names of parcellated regions (taken from roiName Array)
