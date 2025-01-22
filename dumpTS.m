@@ -16,7 +16,7 @@ function y = dumpTS(homeDir, brainHead, roiName, originRes, downRes)
     else
         error("the given home directory doesn't exist")
     end
-    brainDir = sprintf('%s/brain', homeDir);
+    brainDir = sprintf('%s/brains', homeDir);
     maskDir = sprintf('%s/masks', homeDir);
     tsDir = sprintf('%s/timeseries', homeDir);
     roiTsDir = sprintf('%s/timeseries/%s',homeDir, roiName);
