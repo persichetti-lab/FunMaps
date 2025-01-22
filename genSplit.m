@@ -41,23 +41,13 @@ function y = genSplit(homeDir, roiName, roiDownDim, contextDownDim, contextName,
 
     cd(roiTsDir)
     fnames = dir(sprintf('*%s_%imm*.1D',roiName,roiDownDim));
-%     roiMask = sprintf('%s/%s_%0.1fmm.nii',maskDir,roiName,roiDownDim);
-%     contextMask = sprintf('%s/%s_%0.1fmm.nii', maskDir,contextName, contextDownDim);
     roiMask1D = sprintf('%s/%s_%imm.1D',maskDir,roiName,roiDownDim);
     contextMask1D = sprintf('%s/%s_%imm.1D', maskDir,contextName, contextDownDim);
-%     tempCmd = sprintf('3dmaskdump -mask %s -o %s %s', contextMask, contextMask1D, contextMask);
-% % 	[returncode, ~] = system(tempCmd);
-%     [~, ~] = system(tempCmd);
-%     tempCmd = sprintf('3dmaskdump -mask %s -o %s %s', roiMask, roiMask1D, roiMask);
-% % 	[returncode, ~] = system(tempCmd);
-%     [~, ~] = system(tempCmd);   
     roiCoords = load(roiMask1D);
     contextCoords = load(contextMask1D);
     half1 = zeros(length(contextCoords), length(roiCoords));
     half2 = zeros(length(contextCoords), length(roiCoords));
-    %check split halving for odd number subjects, include in documentation
-    %a line about it
-    %have verbose error reporting
+    
     for i = 1:numSplit
         tempind = randperm(length(fnames));
         for j = 1:(length(fnames)/2)
@@ -135,7 +125,6 @@ function y = genSplit(homeDir, roiName, roiDownDim, contextDownDim, contextName,
             tempStr = sprintf('%s/%s_iter%i_rThresh_%.3f_half2',roiSplitsDir,roiName,iters,threshVal);
             convertToPAJ(rTopPercent,tempStr);
 
-      
         end
     
     end
