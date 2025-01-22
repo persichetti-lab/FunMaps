@@ -1,11 +1,14 @@
-%%function takes in 4 inputs
-% 1) directory that contains your cleaned time series files
-% 2) header format of your time series files (optional)
-% 3) roiMask in your scanner resolution
-% 4) downsampled mask in your context resolution (optional)
-% 5) how much you want to resample by (optional)
-%add brain connectivity toolbox to path before running said script
+%% split participants in half several times and threshold as desired correlation matrices as desired
+
 function y = genSplit(homeDir, roiName, roiDownDim, contextDownDim, contextName, numSplit, testThreshArray)
+% 1) homeDir = directory that contains your cleaned time series files
+% 2) roiName = names of parcellated regions (taken from roiName Array)
+% 3) roiDownDim = the desired spatial resolution for parcellation (from roiDownDimArray)
+% 4) contextDownDim = desired spatial resolution for context mask
+% 5) contextName = name of the context mask (e.g., 'WB - whole brain')
+% 6) numSplit = how many split halves to use (default = 10) 
+% 7) testThreshArray = which thresholds to use on the data in each split-half iteration
+
     tsDir = sprintf('%s/timeseries',homeDir);
     maskDir = sprintf('%s/masks',homeDir);
     roiTsDir = sprintf('%s/%s',tsDir,roiName);
