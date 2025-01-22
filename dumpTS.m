@@ -1,24 +1,16 @@
-%%function takes in 4 inputs
-% 1) directory that contains your cleaned time series files (i.e., homeDir)
-% 2) header format of your time series files (optional)
-% 3) roiMask in your scanner resolution
-% 4) downsampled mask in your context resolution (optional)
-% 5) how much you want to resample by (optional)
+%% start with original brain timeseries volumes. creeate 1d files and masks 
+% for all ROIs and context at the desired spatial resolutions
 
-%start with brain data and 
-%%%%make the downsampled mask, include how much to downsample it by
-%have downsample mask result be in context ratio instead
-%have a comment about needing to be isotropic -or that you would have to
-%run your own thing to be nonisotropic
-%add an if statement for downsampling
-%check to see if people have run this already
-%in wrapper make all directories
-%check if directory already exists so as not to rerun it
-%add option to prefix
-%call nifti files brains or something like that
-%feed in wb ts files into context mask and undump it
-%dump ts in roi of choice and then don't save the og resolution 
 function y = dumpTS(homeDir, brainHead, roiName, originRes, downRes)
+% homeDir = directory that contains your cleaned time series files (i.e., homeDir)
+% 2) brainHead = common name of your time series files (e.g., if naming
+% convention is 's1.clean_ts.nii, s2.clean_ts.nii, etc.', then brainHead = clean_ts)
+% 3) roiName = names of parcellated regions (taken from roiName Array)
+% 4) originRes = original spatial resolution of the timeseries data
+% 5) downRes = the desired spatial resolution for the parcellation
+% ** originRes (e.g. 2mm voxles) will be downsampled to the downRes (e.g.,
+% 6mm voxels)
+
     if exist(homeDir,"dir")
         cd(homeDir)
     else
@@ -75,5 +67,3 @@ function y = dumpTS(homeDir, brainHead, roiName, originRes, downRes)
     end
     y = 'done';
 end
-
-%%
