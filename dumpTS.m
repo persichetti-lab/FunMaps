@@ -50,20 +50,15 @@ function y = dumpTS(homeDir, brainHead, roiName, originRes, downRes)
         tempCmd = sprintf('rm *tsA*');
         [~, ~] = system(tempCmd);
         tempCmd = sprintf('3dmaskdump -mask %s/%s -noijk -o %s/%s_%i.1D %s/%s', maskDir, roiMask, roiTsDir, roiName, i, brainDir, fnames(i).name);
-% 	    [returncode, ~] = system(tempCmd);
         [~, ~] = system(tempCmd);
         tempCmd = sprintf('3dcalc -a %s/%s -b %s/%s -datum float -expr ''a*b'' -prefix tsA_1.nii', maskDir, roiMask, brainDir, fnames(i).name);
-%        [returncode, ~] = system(tempCmd);
         [~, ~] = system(tempCmd);
         tempCmd = sprintf('3dresample -master %s/%s -rmode Li -prefix tsA_2.nii -input tsA_1.nii', maskDir, downROImask);
-% 	    [returncode, ~] = system(tempCmd);
         [~, ~] = system(tempCmd);
         tempCmd = sprintf('3dmaskdump -mask %s/%s -noijk -o %s/%s_%imm_%i.1D tsA_2.nii', maskDir, downROImask,roiTsDir, roiName, int32(downRes), i);
-% 	    [returncode, ~] = system(tempCmd);
         [~, ~] = system(tempCmd);
         tempCmd = sprintf('rm *tsA*');
         [~, ~] = system(tempCmd);
-%         [returncode, ~] = system(tempCmd);
     end
     y = 'done';
 end
