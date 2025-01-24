@@ -131,32 +131,32 @@ function y = genSplit(homeDir, roiName, roiDownDim, contextDownDim, contextName,
     disp("thresholding has been achieved")
     y = "done";
 
-    function convertToPAJ(SimMat, outname)
-    %convertToPAJ         Convert to Pajek
-    %   convertToPAJ(SimMat, outname, arcs);
-    %   This function writes a Pajek .net file from a MATLAB simalarity matrix
+function convertToPAJ(SimMat, outname)
+%convertToPAJ         Convert to Pajek
+%   convertToPAJ(SimMat, outname, arcs);
+%   This function writes a Pajek .net file from a MATLAB simalarity matrix
 
-    H = size(SimMat,1);
-    fid = fopen(cat(2,outname,'.net'), 'w');
+H = size(SimMat,1);
+fid = fopen(cat(2,outname,'.net'), 'w');
 
-    %%%VERTICES
-    fprintf(fid, '*vertices %6i \n', H);
-    for i = 1:H
-        fprintf(fid, '%6i "%6i" \n', [i i]);
-    end
+%%%VERTICES
+fprintf(fid, '*vertices %6i \n', H);
+for xx = 1:H
+    fprintf(fid, '%6i "%6i" \n', [xx xx]);
+end
 
-    %%%ARCS/EDGES
-    fprintf(fid, '*edges \n');
+%%%ARCS/EDGES
+fprintf(fid, '*edges \n');
 
-    for i = 1:H
-        for j = 1:H
-            if SimMat(i,j) ~= 0
-                fprintf(fid, '%6i %6i %6f \n', [i j SimMat(i,j)]);
-            end
+for xx = 1:H
+    for yy = 1:H
+        if SimMat(xx,yy) ~= 0
+            fprintf(fid, '%6i %6i %6f \n', [xx yy SimMat(xx,yy)]);
         end
     end
+end
 
-    fclose(fid);
-    end
+fclose(fid);
+end
 
 end
