@@ -1,6 +1,5 @@
-%in wrapper default is to delete tree file, but add a verbose to keep it
-%around and save all intermediate
-%BIDS format universal fmri format (for how to create file structure)
+%in wrapper default is to delete tree file
+
 function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testThreshArray)
             cd(homeDir)
             splitDir = sprintf('%s/splitHalves/%s',homeDir, roiName);
@@ -26,10 +25,11 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
             cd(splitDir)
             coordFile = sprintf('%s/%s_%imm.1D',maskDir, roiName, roiDownDim);
             
-            threshData = zeros(length(testThreshArray),numSplit);
-            numNets = zeros(length(testThreshArray),numSplit);
-            nullThresh = zeros(length(testThreshArray),numSplit);
-            nullNets = zeros(length(testThreshArray),numSplit);
+            threshData = zeros(numSplit,length(testThreshArray));
+            numNets = zeros(numSplit,length(testThreshArray));
+            nullThresh = zeros(numSplit,length(testThreshArray));
+            nullNets = zeros(numSplit,length(testThreshArray));
+            
             for i = 1:numSplit
                 for j=1:length(testThreshArray)
                     for h = 1:2
@@ -55,13 +55,11 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
                     end
                 end
             end
-%             include some way of constructing a directory structure to store all of
-%             the output files
+
             cd(clustRoiDir)
             
             maxSize = load(roiMask);
             sizeThresh = .02 * length(maxSize);
-            %threshArray = [0.5 0.6 0.7 0.8 0.85 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 0.98 0.99 0.995];
             for i = 1:length(testThreshArray)
                adjMat = zeros(length(maxSize));
 
@@ -153,8 +151,8 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
                         end
                     end
                 
-                    nullThresh(i,numSplit) = length(find(agreeKey>0))/length(agreeKey);
-                    nullNets(i,numSplit) = agreeCounter;
+                    nullThresh(j,i) = length(find(agreeKey>0))/length(agreeKey);
+                    nullNets(j,i) = agreeCounter;
                                 
                 end
             
@@ -166,40 +164,32 @@ function f = genClust(infoMapDir, homeDir, roiName, numSplit, roiDownDim, testTh
             convertToPAJ(threshMat,tempStr);
             
             end
+
+            save("agreeTable.mat","threshData","numNets");
+            
             %%plot curves
-            %add a flag to plot curves if they want to just save, add
-            %option to view
+
             figure
             hold on
-            plot(testThreshArray,mean(threshData,2));
-            plot(testThreshArray,mean(threshData,2)+std(threshData,2)/sqrt(numSplit));
-            plot(testThreshArray,mean(threshData,2)-std(threshData,2)/sqrt(numSplit));
-            plot(testThreshArray,mean(nullThresh,2));
-            plot(testThreshArray,mean(nullThresh,2)+std(nullThresh,2)/sqrt(numSplit));
-            plot(testThreshArray,mean(nullThresh,2)-std(nullThresh,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(threshData));
+            plot(testThreshArray,mean(threshData)+std(threshData)/sqrt(numSplit));
+            plot(testThreshArray,mean(threshData)-std(threshData)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullThresh));
+            plot(testThreshArray,mean(nullThresh)+std(nullThresh)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullThresh)-std(nullThresh)/sqrt(numSplit));
             
             figure
             hold on
-            plot(testThreshArray,mean(numNets,2));
-            plot(testThreshArray,mean(numNets,2)+std(numNets,2)/sqrt(numSplit));
-            plot(testThreshArray,mean(numNets,2)-std(numNets,2)/sqrt(numSplit));
-            plot(testThreshArray,mean(nullNets,2));
-            plot(testThreshArray,mean(nullNets,2)+std(nullNets,2)/sqrt(numSplit));
-            plot(testThreshArray,mean(nullNets,2)-std(nullNets,2)/sqrt(numSplit));
+            plot(testThreshArray,mean(numNets));
+            plot(testThreshArray,mean(numNets)+std(numNets)/sqrt(numSplit));
+            plot(testThreshArray,mean(numNets)-std(numNets)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullNets));
+            plot(testThreshArray,mean(nullNets)+std(nullNets)/sqrt(numSplit));
+            plot(testThreshArray,mean(nullNets)-std(nullNets)/sqrt(numSplit));
 
-            save("agreeTable.mat","threshData","numNets");
-
-%     
-%             threshAgree = [testThreshArray mean(threshData') ];
-% 
-%             numAgree = [testThreshArray mean(numNets') ];
-%      
-%             agreeArray = threshAgree(:,2) .* numAgree(:,2);
-%             [~, suggestedThresh] = max(agreeArray(:,2));
-%             f = suggestedThresh;
             f = "done";
 
-function convertToPAJ(SimMat, outname)
+    function convertToPAJ(SimMat, outname)
 %convertToPAJ         Convert to Pajek
 %   convertToPAJ(SimMat, outname, arcs);
 %   This function writes a Pajek .net file from a MATLAB simalarity matrix
@@ -228,5 +218,3 @@ fclose(fid);
 end
 
 end 
-          
-        
