@@ -1,8 +1,7 @@
 
 function f = genParc( homeDir,infoMapDir, roiNameArray, contextName, roiDownDimArray, contextDownDim, contextOriginDim, roiThreshArray)
-% function f = genParc( inParc_1, outParc_1,combine, outName_2, inName_2,...
-% wrkDir_1, outDir,wrkDir_2, tsDir,ts_1,ts_2,ts_whole_down,ts_whole, mask1,...
-% mask2, context_Down_Mask, context_Mask, outMap)
+% 
+
     cd(homeDir)
     %roiTab = cell(length(roiNameArray));
     contextTsDir = sprintf('%s/timeseries/%s', homeDir, contextName);
@@ -74,7 +73,7 @@ function f = genParc( homeDir,infoMapDir, roiNameArray, contextName, roiDownDimA
     roi_Down_Fnames = dir(sprintf('*%imm*.1D',contextDownDim));
     
     roi_Mat = cell(length(roiNameArray),1);
-%roi_Fnames = cell(1:length(roiArray));
+    %roi_Fnames = cell(1:length(roiArray));
 
     for i = 1:length(roiNameArray)
         cd(maskDir)
