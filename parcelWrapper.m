@@ -1,25 +1,28 @@
-%%Variables to run the parcellation routine from start to finish
+%% Variables to run the parcellation routine from start to finish
 currentFolder = pwd;
 addpath(currentFolder);
-%home directory for your parcellation data
-homeDir = '/misc/data17/persichettias/jiayu/methodsPaper/TDRun2';
-%shared formatting text for your brain files
-brainHead = 'clean_restTS';
-%Name, native, and downsampled resolution(mm) of your context region
+
+% home directory for your parcellation data. should include three dirs:
+% brains, masks, and funMaps code
+homeDir = '/misc/data17/persichettias/restTests/restFreqs';
+
+% shared formatting text for your brain files
+brainHead = 'clean_ts';
+
+% Name, native, and downsampled resolution(mm) of your context region
 contextName = 'WB';
-originDim = 2;
+originDim = 2; % resolution of isotropic voxels in mm
 contextDownDim = 6;
-%Name and downsampled resolution(mm) of your ROI 
+
+% Name and downsampled resolution(mm) of your ROI 
 roiNameArray = ["cortex", "subcortex"];
 roiDownDimArray = [6 3];
 
-
-%number of split half iterations you are using
+% number of split half iterations you are using
 numSplit = 10;
-%make clear you have to point it to the Infomap directory afni has to be
-%added to path
+
 %path to infomap installlation make sure infomap binary is in your OS
-infoMapDir = '/misc/data17/persichettias/jiayu/methodsPaper/Infomap/Infomap';
+infoMapDir = '/misc/data17/persichettias/funmaps/Infomap/Infomap';
 
 %Threshold arrays to test to determine which is optimal for your data,
 %change to suit your needs
@@ -27,7 +30,9 @@ testThreshArray = [0.5 0.6 0.7 0.8 0.85 0.90 0.91 0.92 0.93 0.94 0.95 0.96 0.97 
 %selected threshold for use for each of your rois
 roiThreshArray = zeros(length(roiNameArray),1);
 
-%Dump your brain time series into 1D files for each of the roi's
+%%%%% functions %%%%%
+
+%% 1. Dump your brain time series into 1D files for each ROI
 for i = 1:length(roiNameArray)
     dumpTS(homeDir, brainHead, roiNameArray(i), originDim, roiDownDimArray(i))
 end
@@ -35,22 +40,27 @@ end
 %Dump your brain time series into 1D files for context region
 dumpTS(homeDir, brainHead, contextName, originDim, contextDownDim)
 
-%Generate split halves for each roi
+%% 2. Generate split halves for each roi
 for i = 1:length(roiNameArray)
     genSplit(homeDir, roiNameArray(i), roiDownDimArray(i), contextDownDim, contextName, numSplit, testThreshArray)
 end
 
-%Generate preliminary clusters for each roi
+%% 3. Generate preliminary clusters for each roi
 for i = 1:length(roiNameArray)
     genClust(infoMapDir, homeDir, roiNameArray(i), numSplit, roiDownDimArray(i), testThreshArray)
 end
 
-%Remap clusters for each ROI back onto the context and combine them
+%% 4. Remap clusters for each ROI back onto the context and combine them
 for i = 1:length(roiNameArray)
     promptText = sprintf('input selected threshold for %s:',roiNameArray(i));
     roiThreshArray(i,1) = input(promptText);
 end
 genParc( homeDir,infoMapDir, roiNameArray, contextName, roiDownDimArray, contextDownDim, originDim, roiThreshArray)
 
-%generate volumes of prototypes and parcels for visualization
+%% 5. generate volumes of prototypes and parcels for visualization
+% UNCOMMENT roiThreshArray LOOP IF RUNNING FUNCTIONS A LA CARTE
+% for i = 1:length(roiNameArray)
+%     promptText = sprintf('input selected threshold for %s:',roiNameArray(i));
+%     roiThreshArray(i,1) = input(promptText);
+% end
 genVolume( homeDir, roiNameArray, contextName, originDim, roiThreshArray, roiDownDimArray)
